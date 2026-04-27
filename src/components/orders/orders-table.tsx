@@ -3,12 +3,11 @@ import { ArrowDown, ArrowUp, ChevronsUpDown, Pencil, Trash2 } from 'lucide-react
 import type { Order, OrderStatus } from '../../hooks/use-orders'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { cn } from '../../lib/utils'
+import { cn, formatDate } from '../../lib/utils'
 
 type OrdersTableProps = {
   orders: Order[]
   editingOrderId: number | null
-  rowOffset?: number
   sortField: OrderDateSortField
   sortDirection: SortDirection
   onSort: (field: OrderDateSortField) => void
@@ -68,7 +67,6 @@ function SortableHeader({
 export function OrdersTable({
   orders,
   editingOrderId,
-  rowOffset = 0,
   sortField,
   sortDirection,
   onSort,
@@ -99,7 +97,7 @@ export function OrdersTable({
                 sortDirection={sortDirection}
                 onSort={onSort}
               >
-                Data de conclusao
+                Data de conclusão
               </SortableHeader>
             </th>
             <th className="px-3 py-3 font-medium">Documento</th>
@@ -133,10 +131,10 @@ export function OrdersTable({
                 <td className="px-3 py-3">
                   <Badge status={statusVariant(order.status)}>{order.status}</Badge>
                 </td>
-                <td className="px-3 py-3">{order.orderDate}</td>
-                <td className="px-3 py-3">{order.doneDate}</td>
+                <td className="px-3 py-3">{formatDate(order.orderDate)}</td>
+                <td className="px-3 py-3">{formatDate(order.doneDate)}</td>
                 <td className="px-3 py-3">{order.document}</td>
-                <td className="px-3 py-3">{order.paymentDate}</td>
+                <td className="px-3 py-3">{formatDate(order.paymentDate)}</td>
                 <td className="px-3 py-3">{order.value}</td>
                 <td className="px-3 py-3">
                   <Button size="sm" variant={'info'}>

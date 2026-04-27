@@ -1,7 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Calendar, Search, X } from 'lucide-react'
+import { Calendar, LogOut, Search, UserRound, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { OrdersTable } from '../components/orders/orders-table'
 import type { OrderDateSortField, SortDirection } from '../components/orders/orders-table'
+import { useAccessUsers } from '../hooks/use-access-users'
 import { useOrders, type CreateOrderInput, type Order, type OrderStatus } from '../hooks/use-orders'
 import { Button } from '../components/ui/button'
 
@@ -35,6 +37,8 @@ function toDateTimestamp(date: string) {
 }
 
 export function OrdersPage() {
+  const navigate = useNavigate()
+  const { currentUser, logout } = useAccessUsers()
   const { orders, createOrder, updateOrder, deleteOrder } = useOrders()
   const [form, setForm] = useState<CreateOrderInput>(initialForm)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -161,13 +165,33 @@ export function OrdersPage() {
     setSortDirection('desc')
   }
 
+  function handleLogout() {
+    logout()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div className="min-h-screen bg-zinc-100 p-4 sm:p-8">
       <main className="mx-auto max-w-7xl rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-6">
-        <header className="mb-6">
-          <h1 className="text-4xl font-semibold text-violet-500">
-            Gestão de Tatuagem - Pedidos
-          </h1>
+        <header className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 className="text-4xl font-semibold text-violet-500">
+              Gestão de Tatuagem - Pedidos
+            </h1>
+            {currentUser ? (
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-zinc-600">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                  <UserRound size={15} />
+                </span>
+                <span className="font-medium text-zinc-800">{currentUser.name}</span>
+                <span>{currentUser.email}</span>
+              </div>
+            ) : null}
+          </div>
+          <Button type="button" variant="light" className="gap-2 self-start" onClick={handleLogout}>
+            <LogOut size={15} />
+            Sair
+          </Button>
         </header>
 
         <section className="mb-5 grid gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 md:grid-cols-6">
@@ -196,7 +220,7 @@ export function OrdersPage() {
             </span>
           </label>
           <label className="grid gap-1 text-xs font-medium text-zinc-600">
-            Data de conclusao
+            Data de conclusão
             <span className="relative">
               <input
                 type="date"
@@ -220,7 +244,7 @@ export function OrdersPage() {
             </span>
           </label>
           <label className="grid gap-1 text-xs font-medium text-zinc-600">
-            Numero do pedido
+            Número do pedido
             <span className="relative">
               <input
                 inputMode="numeric"
@@ -264,7 +288,7 @@ export function OrdersPage() {
             />
           </label>
           <label className="grid gap-1 text-xs font-medium text-zinc-600">
-            Data de conclusao
+            Data de conclusão
             <input
               type="date"
               value={form.doneDate}
@@ -314,7 +338,6 @@ export function OrdersPage() {
         <OrdersTable
           orders={paginatedOrders}
           editingOrderId={editingId}
-          rowOffset={pageStartIndex}
           sortField={sortField}
           sortDirection={sortDirection}
           onSort={handleSort}

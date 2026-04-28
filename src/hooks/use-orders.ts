@@ -11,6 +11,7 @@ export type OrderStatus = 'Confirmado' | 'Enviado'
 
 export type Order = {
   id: number
+  client: string
   status: OrderStatus
   orderDate: string
   doneDate: string
@@ -25,6 +26,7 @@ export type CreateOrderInput = Omit<Order, 'id' | 'expanded'>
 const initialOrders: Order[] = [
   {
     id: 1596,
+    client: 'João da Silva',
     status: 'Confirmado',
     orderDate: '21-04-2026',
     doneDate: '24-04-2026',
@@ -34,6 +36,7 @@ const initialOrders: Order[] = [
   },
   {
     id: 1595,
+    client: 'Maria Oliveira',
     status: 'Confirmado',
     orderDate: '21-04-2026',
     doneDate: '24-04-2026',
@@ -43,6 +46,7 @@ const initialOrders: Order[] = [
   },
   {
     id: 1594,
+    client: 'Carlos Santos',
     status: 'Confirmado',
     orderDate: '24-04-2026',
     doneDate: '25-04-2026',
@@ -53,6 +57,7 @@ const initialOrders: Order[] = [
   },
   {
     id: 1593,
+    client: 'Ana Costa',
     status: 'Enviado',
     orderDate: '19-04-2026',
     doneDate: '20-04-2026',
@@ -63,7 +68,11 @@ const initialOrders: Order[] = [
 ]
 
 export function useOrders() {
-  const [orders, setOrders] = useLocalStorage<Order[]>('orders-crud', initialOrders)
+  const [storedOrders, setOrders] = useLocalStorage<Order[]>('orders-crud', initialOrders)
+  const orders = (storedOrders ?? []).map((order) => ({
+    ...order,
+    client: order.client ?? '',
+  }))
 
   function createOrder(input: CreateOrderInput) {
     const nextId =

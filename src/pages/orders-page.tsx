@@ -8,6 +8,7 @@ import { useOrders, type CreateOrderInput, type Order, type OrderStatus } from '
 import { Button } from '../components/ui/button'
 
 const initialForm: CreateOrderInput = {
+  client: '',
   status: 'Confirmado',
   orderDate: '',
   doneDate: '',
@@ -49,6 +50,7 @@ export function OrdersPage() {
   const [doneDateFilter, setDoneDateFilter] = useState('')
   const [paymentDateFilter, setPaymentDateFilter] = useState('')
   const [orderIdFilter, setOrderIdFilter] = useState('')
+  const [clientFilter, setClientFilter] = useState('')
   const [sortField, setSortField] = useState<OrderDateSortField>('orderDate')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
@@ -58,6 +60,10 @@ export function OrdersPage() {
     .filter((order) => !doneDateFilter || toInputDate(order.doneDate) === doneDateFilter)
     .filter((order) => !paymentDateFilter || toInputDate(order.paymentDate) === paymentDateFilter)
     .filter((order) => !orderIdFilter.trim() || String(order.id).includes(orderIdFilter.trim()))
+    .filter((order) => {
+      const search = clientFilter.trim().toLowerCase()
+      return !search || order.client.toLowerCase().includes(search)
+    })
     .sort((firstOrder, secondOrder) => {
       const firstDate = toDateTimestamp(firstOrder[sortField])
       const secondDate = toDateTimestamp(secondOrder[sortField])
@@ -84,6 +90,7 @@ export function OrdersPage() {
     doneDateFilter,
     paymentDateFilter,
     orderIdFilter,
+    clientFilter,
     sortField,
     sortDirection,
   ])
@@ -103,7 +110,7 @@ export function OrdersPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     
-    if (!form.document.trim() || !form.value.trim() || 
+    if (!form.client.trim() || !form.document.trim() || !form.value.trim() ||
     !form.orderDate || !form.doneDate || !form.paymentDate) {
       alert('Por favor, preencha todos os campos obrigatórios.')
       return
@@ -128,6 +135,7 @@ export function OrdersPage() {
   function handleEdit(order: Order) {
     setEditingId(order.id)
     setForm({
+      client: order.client,
       status: order.status,
       orderDate: toInputDate(order.orderDate),
       doneDate: toInputDate(order.doneDate),
@@ -153,6 +161,7 @@ export function OrdersPage() {
     setDoneDateFilter('')
     setPaymentDateFilter('')
     setOrderIdFilter('')
+    setClientFilter('')
   }
 
   function handleSort(field: OrderDateSortField) {
@@ -256,6 +265,18 @@ export function OrdersPage() {
               <Search size={15} className="pointer-events-none absolute left-3 top-3 text-zinc-400" />
             </span>
           </label>
+          <label className="grid gap-1 text-xs font-medium text-zinc-600">
+            Cliente
+            <span className="relative">
+              <input
+                value={clientFilter}
+                onChange={(event) => setClientFilter(event.target.value)}
+                placeholder="Buscar cliente"
+                className="h-10 w-full rounded-md border border-zinc-200 bg-white px-3 pl-9 text-sm text-zinc-700"
+              />
+              <Search size={15} className="pointer-events-none absolute left-3 top-3 text-zinc-400" />
+            </span>
+          </label>
           <div className="flex items-end gap-2 md:col-span-1">
             <Button type="button" variant="light" onClick={clearFilters} className='text-violet-500'>
               Limpar filtros
@@ -267,6 +288,15 @@ export function OrdersPage() {
           onSubmit={handleSubmit}
           className="mb-6 grid gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 md:grid-cols-6"
         >
+          <label className="grid gap-1 text-xs font-medium text-zinc-600">
+            Cliente
+            <input
+              placeholder="Nome do cliente"
+              value={form.client}
+              onChange={(event) => handleChange('client', event.target.value)}
+              className="h-10 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-700"
+            />
+          </label>
           <label className="grid gap-1 text-xs font-medium text-zinc-600">
             Status
             <select
@@ -404,6 +434,9 @@ export function OrdersPage() {
             </div>
 
             <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">
+              <span className="block font-medium text-zinc-800">
+                {orderPendingDeletion.client}
+              </span>
               <span className="font-medium text-zinc-800">
                 {orderPendingDeletion.document}
               </span>

@@ -41,12 +41,13 @@ function createOrderPdf(order: Order) {
   const lines = [
     createPdfLine('Resumo do pedido', 50, 780, 18),
     createPdfLine(`ID: ${order.id}`, 50, 735),
-    createPdfLine(`Status: ${order.status}`, 50, 710),
-    createPdfLine(`Data do pedido: ${formatDate(order.orderDate)}`, 50, 685),
-    createPdfLine(`Data de conclusao: ${formatDate(order.doneDate)}`, 50, 660),
-    createPdfLine(`Documento: ${order.document}`, 50, 635),
-    createPdfLine(`Data de pagamento: ${formatDate(order.paymentDate)}`, 50, 610),
-    createPdfLine(`Valor liquido/bruto: ${order.value}`, 50, 585),
+    createPdfLine(`Cliente: ${order.client}`, 50, 710),
+    createPdfLine(`Status: ${order.status}`, 50, 685),
+    createPdfLine(`Data do pedido: ${formatDate(order.orderDate)}`, 50, 660),
+    createPdfLine(`Data de conclusao: ${formatDate(order.doneDate)}`, 50, 635),
+    createPdfLine(`Documento: ${order.document}`, 50, 610),
+    createPdfLine(`Data de pagamento: ${formatDate(order.paymentDate)}`, 50, 585),
+    createPdfLine(`Valor liquido/bruto: ${order.value}`, 50, 560),
   ]
 
   const content = lines.join('\n')
@@ -147,6 +148,7 @@ export function OrdersTable({
         <thead className="bg-zinc-50 text-zinc-500">
           <tr>
             <th className="px-3 py-3 font-medium">ID</th>
+            <th className="px-3 py-3 font-medium">Cliente</th>
             <th className="px-3 py-3 font-medium">Status</th>
             <th className="px-3 py-3 font-medium">
               <SortableHeader
@@ -196,6 +198,7 @@ export function OrdersTable({
                 )}
               >
                 <td className="px-3 py-3 font-medium">{order.id}</td>
+                <td className="px-3 py-3">{order.client}</td>
                 <td className="px-3 py-3">
                   <Badge status={statusVariant(order.status)}>{order.status}</Badge>
                 </td>
